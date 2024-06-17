@@ -1,41 +1,48 @@
-from post import postWithRetry
+from amenity import createAmenities, publishAmenities
+from collection import createCategories, publishCategories
+from destination import createDestinations, publishDestinations
+from hotelClass import createHotelClasses, publishHotelClasses
 from readFile import readFile
 
 strapi_domain = "http://localhost:1337"
-error_items = []
-error_publish_items = []
-destinations = readFile()
+error_destinations_items = []
+error_destinations_publish_items = []
+error_categories_items = []
+error_categories_publish_items = []
+error_amenities_items = []
+error_amenities_publish_items = []
+error_hotel_classes_items = []
+error_hotel_classes_publish_items = []
+destinations, categories, amenities, hotel_classes = readFile()
 
-# Create collections
-url = f"{strapi_domain}/content-manager/collection-types/api::destination.destination"
-collection_results = []
-for d in destinations:
-    body = {
-        "articles": {"disconnect": [], "connect": []},
-        "hotels": {"disconnect": [], "connect": []},
-        "name": d["name"],
-        "taId": d["taId"],
-        "slug": d["slug"],
-    }
-    result = postWithRetry(url, error_items, body)
-    if result:
-        collection_results.append(result)
-if collection_results.__sizeof__() > 0:
-    print("Successfully create collection.")
-else:
-    print("Failed to create collection after 3 retries.")
-    print("Error on: ", error_items)
+# Destinations
+destinations_results, error_destinations_items = createDestinations(
+    strapi_domain, destinations, error_destinations_items
+)
+destinations_publish_results, error_destinations_items = publishDestinations(
+    strapi_domain, destinations_results, error_destinations_publish_items
+)
 
-# Publish collections
-publish_results = None
-for c in collection_results:
-    id = c["id"]
-    url = f"{strapi_domain}/content-manager/collection-types/api::destination.destination/{id}/actions/publish"
-    publish_results = postWithRetry(url, error_publish_items, retry_count=5)
-if publish_results:
-    print("Successfully publish collection.")
-elif publish_results == None:
-    print("Nothing to publish")
-else:
-    print("Failed to publish collection after 3 retries.")
-    print("Error on: ", error_publish_items)
+# Categories
+categories_results, error_categories_items = createCategories(
+    strapi_domain, categories, error_categories_items
+)
+categories_publish_results, error_categories_items = publishCategories(
+    strapi_domain, categories_results, error_categories_publish_items
+)
+
+# Amenities
+amenities_results, error_amenities_items = createAmenities(
+    strapi_domain, amenities, error_amenities_items
+)
+amenities_publish_results, error_amenities_items = publishAmenities(
+    strapi_domain, amenities_results, error_amenities_publish_items
+)
+
+# Hotel Class
+hotel_classes_results, error_hotel_classes_items = createHotelClasses(
+    strapi_domain, hotel_classes, error_hotel_classes_items
+)
+hotel_classes_publish_results, error_hotel_classes_items = publishHotelClasses(
+    strapi_domain, hotel_classes_results, error_hotel_classes_publish_items
+)

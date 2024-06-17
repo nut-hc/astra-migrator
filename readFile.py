@@ -1,13 +1,32 @@
+import csv
+import json
+
+
 def readFile():
-    destinations = [
-        {"name": "France", "slug": "france", "taId": "1111"},
-        # {"name": "Canada", "slug": "canada", "taId": "1112"},
-        # {"name": "Portugal", "slug": "portugal", "taId": "1113"},
-        # {"name": "Italy", "slug": "italy", "taId": "1114"},
-        # {"name": "Spain", "slug": "spain", "taId": "1115"},
-        # {"name": "Pattaya", "slug": "pattaya", "taId": "1116"},
-        # {"name": "England", "slug": "england", "taId": "1117"},
-        # {"name": "USA", "slug": "usa", "taId": "1118"},
-        # {"name": "Thailand", "slug": "thailand", "taId": "1119"},
-    ]
-    return destinations
+    destinations = []
+    categories = []
+    amenities = []
+    hotel_classes = []
+    with open("source/ValidHotels.csv", newline="") as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            # Example: {"name":"Seven Mile Beach","slug":"seven-mile-beach","taId":"147367"}
+            tempDestinations = json.loads(row["Destination"])
+            for t in tempDestinations:
+                destinations.append(t)
+
+            # Example: {"name":"Kid-Friendly","slug":"kid-friendly"}
+            tempCategories = json.loads(row["Category"])
+            for t in tempCategories:
+                categories.append(t)
+
+            # Example: {"name":"Beach","slug":"beach"}
+            tempAmenities = json.loads(row["Amenity"])
+            for t in tempAmenities:
+                amenities.append(t)
+
+            # Example: {"name":"Upscale","slug":"upscale"}
+            tempHotelClasses = json.loads(row["Hotel Class"])
+            for t in tempHotelClasses:
+                hotel_classes.append(t)
+    return destinations, categories, amenities, hotel_classes
